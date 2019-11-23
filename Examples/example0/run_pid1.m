@@ -1,0 +1,57 @@
+clear
+
+w = 3;
+w_pert = w;
+z = 0.1;
+
+s = tf('s');
+
+
+olp = 2/(s^2 + 2*z*w_pert*s + w_pert^2);
+
+K1 = 0.5*1000*(s^2 + 2*z*w*s + w^2)/(s*(s+10)^3);
+
+figure(1);
+bode(olp,K1*olp);
+legend('olp','K1*olp');
+grid on
+
+Kp = 1;
+Ki = 0.25;
+
+Kpi = Kp + Ki/s;
+Ksys = K1*Kpi;
+
+loop = Ksys * olp;
+
+om = 1e-2:0.01:1e2;
+t = 0:0.01:30;
+
+figure(2); clf
+margin(loop);
+xlim([1e-2 1e2])
+grid on
+
+figure(3); clf
+bode(olp,om)
+hold on
+bode(Ksys,om);
+legend('olp','Ksys')
+grid on
+
+clp = loop/(1+loop);
+figure(4);
+step(olp,clp,t)
+grid on
+legend('olp','clp');
+
+figure(5);
+bode(clp,om)
+legend('clp');
+grid on;
+
+figure(6)
+step(Ksys/(1+loop),t)
+legend('u')
+grid on;
+
